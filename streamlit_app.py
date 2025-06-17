@@ -92,7 +92,10 @@ if run:
                 if result.plots.get("temporal"):
                     st.image(str(result.plots["temporal"]), caption="Timeline Anomali")
                 if result.plots.get("statistic"):
-
+                    st.image(
+                        str(result.plots["statistic"]),
+                        caption="Plot Statistik",
+                    )
             with tab5:
                 st.header("Penyusunan Laporan & Validasi Forensik")
                 if result.pdf_report_path and result.pdf_report_path.exists():
