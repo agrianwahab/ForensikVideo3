@@ -2,6 +2,7 @@
 
 import streamlit as st
 from pathlib import Path
+from typing import Optional, Union
 import tempfile
 import ForensikVideo as fv
 import sys
@@ -43,7 +44,7 @@ with st.sidebar:
     run = st.button("🚀 Jalankan Analisis Forensik", use_container_width=True)
 
 # --- FUNGSI BANTUAN ---
-def load_image_as_bytes(path_str: str | Path | None) -> bytes | None:
+def load_image_as_bytes(path_str: Optional[Union[str, Path]]) -> Optional[bytes]:
     """Membaca file gambar dari path dan mengembalikannya sebagai byte."""
     if path_str and Path(path_str).exists():
         try:
