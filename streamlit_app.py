@@ -10,7 +10,6 @@ import io
 import traceback
 from datetime import datetime
 import pandas as pd
-from typing import Optional, Union
 
 # --- KONFIGURASI HALAMAN DAN GAYA ---
 st.set_page_config(
