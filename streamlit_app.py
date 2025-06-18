@@ -9,6 +9,7 @@ import io
 import traceback
 from datetime import datetime
 import pandas as pd
+from typing import Optional, Union
 
 # --- KONFIGURASI HALAMAN DAN GAYA ---
 st.set_page_config(
@@ -43,7 +44,7 @@ with st.sidebar:
     run = st.button("🚀 Jalankan Analisis Forensik", use_container_width=True)
 
 # --- FUNGSI BANTUAN ---
-def load_image_as_bytes(path_str: str | Path | None) -> bytes | None:
+def load_image_as_bytes(path_str: Optional[Union[str, Path]]) -> Optional[bytes]:
     """Membaca file gambar dari path dan mengembalikannya sebagai byte."""
     if path_str and Path(path_str).exists():
         try:
