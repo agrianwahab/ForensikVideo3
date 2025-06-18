@@ -40,7 +40,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict, Counter
-from typing import List, Optional, Union, Tuple
 
 # Pemeriksaan Dependensi Awal
 try:
@@ -87,22 +86,22 @@ def print_stage_banner(stage_number: int, stage_name: str, icon: str, descriptio
 
 @dataclass
 class Evidence:
-    reasons: List[str] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
     confidence: str = "N/A"
-    ela_path: Optional[str] = None
-    sift_path: Optional[str] = None
+    ela_path: str | None = None
+    sift_path: str | None = None
 
 @dataclass
 class FrameInfo:
     index: int
     timestamp: float
     img_path: str
-    hash: Optional[str] = None
+    hash: str | None = None
     type: str = "original"
-    ssim_to_prev: Optional[float] = None
-    optical_flow_mag: Optional[float] = None
-    color_cluster: Optional[int] = None
+    ssim_to_prev: float | None = None
+    optical_flow_mag: float | None = None
+    color_cluster: int | None = None
     evidence_obj: Evidence = field(default_factory=Evidence)
 
 @dataclass
@@ -110,16 +109,16 @@ class AnalysisResult:
     video_path: str
     preservation_hash: str
     metadata: dict
-    frames: List[FrameInfo]
+    frames: list[FrameInfo]
     summary: dict = field(default_factory=dict)
     plots: dict = field(default_factory=dict)
-    localizations: List[dict] = field(default_factory=list)
-    pdf_report_path: Optional[Path] = None
+    localizations: list[dict] = field(default_factory=list)
+    pdf_report_path: Path | None = None
 
 ###############################################################################
 # Fungsi Analisis Individual (tidak berubah)
 #<editor-fold desc="Fungsi Analisis Inti">
-def perform_ela(image_path: Path, quality: int=90) -> Optional[Path]:
+def perform_ela(image_path: Path, quality: int=90) -> Path | None:
     try:
         ela_dir = image_path.parent.parent / "ela_artifacts"
         ela_dir.mkdir(exist_ok=True)
@@ -141,7 +140,7 @@ def perform_ela(image_path: Path, quality: int=90) -> Optional[Path]:
         log(f"  {Icons.ERROR} Gagal ELA pada {image_path.name}: {e}")
         return None
 
-def compare_sift(img_path1: Path, img_path2: Path, out_dir: Path) -> Tuple[int, Optional[Path]]:
+def compare_sift(img_path1: Path, img_path2: Path, out_dir: Path) -> tuple[int, Path | None]:
     try:
         img1 = cv2.imread(str(img_path1), cv2.IMREAD_GRAYSCALE)
         img2 = cv2.imread(str(img_path2), cv2.IMREAD_GRAYSCALE)
@@ -205,7 +204,7 @@ def extract_frames(video_path: Path, out_dir: Path, fps: int) -> int:
 ###############################################################################
 
 # --- TAHAP 1: PRA-PEMROSESAN & EKSTRAKSI FITUR DASAR ---
-def run_tahap_1_pra_pemrosesan(video_path: Path, out_dir: Path, fps: int) -> Optional[AnalysisResult]:
+def run_tahap_1_pra_pemrosesan(video_path: Path, out_dir: Path, fps: int) -> AnalysisResult | None:
     print_stage_banner(1, "Pra-pemrosesan & Ekstraksi Fitur Dasar", Icons.COLLECTION, 
                        "Melakukan hashing, ekstraksi metadata, ekstraksi frame, pHash, dan analisis warna.")
     
@@ -258,7 +257,7 @@ def run_tahap_1_pra_pemrosesan(video_path: Path, out_dir: Path, fps: int) -> Opt
     return AnalysisResult(str(video_path), preservation_hash, metadata, frames)
 
 # --- TAHAP 2: ANALISIS ANOMALI TEMPORAL & KOMPARATIF ---
-def run_tahap_2_analisis_temporal(result: AnalysisResult, baseline_result: Optional[AnalysisResult] = None):
+def run_tahap_2_analisis_temporal(result: AnalysisResult, baseline_result: AnalysisResult | None = None):
     print_stage_banner(2, "Analisis Anomali Temporal & Komparatif", Icons.ANALYSIS,
                        "Menganalisis aliran optik, SSIM, dan perbandingan dengan baseline jika ada.")
     frames = result.frames
@@ -449,7 +448,7 @@ def run_tahap_4_visualisasi_dan_penilaian(result: AnalysisResult, out_dir: Path)
     log(f"  {Icons.SUCCESS} Tahap 4 Selesai.")
 
 # --- TAHAP 5: PENYUSUNAN LAPORAN & VALIDASI FORENSIK ---
-def run_tahap_5_pelaporan_dan_validasi(result: AnalysisResult, out_dir: Path, baseline_result: Optional[AnalysisResult] = None):
+def run_tahap_5_pelaporan_dan_validasi(result: AnalysisResult, out_dir: Path, baseline_result: AnalysisResult | None = None):
     print_stage_banner(5, "Penyusunan Laporan & Validasi Forensik", Icons.REPORTING,
                        "Menghasilkan laporan PDF naratif yang komprehensif dan dapat diaudit.")
     
@@ -594,7 +593,7 @@ def run_tahap_5_pelaporan_dan_validasi(result: AnalysisResult, out_dir: Path, ba
 ###############################################################################
 # Fungsi Pipeline Utama
 ###############################################################################
-def run_full_analysis_pipeline(video_path: Path, out_dir: Path, fps: int, baseline_path: Optional[Path]) -> Optional[AnalysisResult]:
+def run_full_analysis_pipeline(video_path: Path, out_dir: Path, fps: int, baseline_path: Path | None) -> AnalysisResult | None:
     """
     Menjalankan pipeline forensik 5 tahap secara lengkap.
     """
